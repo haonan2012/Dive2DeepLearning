@@ -5,7 +5,7 @@ import os
 
 def random_light_color(img, shift):
     # brightness
-    if img.shape[2] == 1:
+    if len(img.shape) == 2:
         return img
     B, G, R = cv2.split(img)
     for C in [B,G,R]:
@@ -16,7 +16,7 @@ def random_light_color(img, shift):
     return cv2.merge((B, G, R))
 
 def random_perspective_transform(img):
-    height, width, _ = img.shape
+    height, width = img.shape[:2]
     # warp:
     random_margin = 60
     x1 = random.randint(-random_margin, random_margin)
@@ -44,17 +44,17 @@ def random_perspective_transform(img):
     return img_warp
 
 def img_data_augmentation(img, crop_ratio = 1.0, color_shift = 0, rotation = 0, perspective_transform = False):
-    height, width, channel = img.shape
     assert crop_ratio > 0 and crop_ratio <= 1.0
-    assert channel == 1 or channel == 3
+    assert len(img.shape) == 2 or len(img.shape) == 3
+    height, width = img.shape[:2]
 
     if crop_ratio < 1.0:
         crop_height, crop_width = int(height * crop_ratio), int(width * crop_ratio)
         y = random.randint(0, height - crop_height)
         x = random.randint(0, width - crop_width)
-        if channel == 1:
+        if len(img.shape) == 2:
             img = img[y:y+crop_height, x:x+crop_width]
-        if channel == 3:
+        if len(img.shape) == 3:
             img = img[y:y+crop_height, x:x+crop_width, :]
     
     if color_shift != 0:
@@ -70,7 +70,7 @@ def img_data_augmentation(img, crop_ratio = 1.0, color_shift = 0, rotation = 0, 
 
     return img
 
-img = cv2.imread('1.jpg')
+img = cv2.imread('1.jpg', 0)
 
 save_path = 'gene_data'
 if not os.path.exists(save_path):
