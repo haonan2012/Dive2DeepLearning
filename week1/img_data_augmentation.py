@@ -5,13 +5,14 @@ import os
 
 def random_light_color(img, shift):
     # brightness
+    if img.shape[2] == 1:
+        return img
     B, G, R = cv2.split(img)
     for C in [B,G,R]:
         rand_shift = random.randint(-shift, shift)
         C[C > 255 - rand_shift] = 255 - rand_shift
         C[C < -rand_shift] = -rand_shift
         C[:] = C[:] + rand_shift
-
     return cv2.merge((B, G, R))
 
 def random_perspective_transform(img):
